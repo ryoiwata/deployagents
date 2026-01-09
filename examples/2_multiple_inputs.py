@@ -28,9 +28,15 @@ class AgentState(TypedDict):
 
 def process_values(state: AgentState) -> AgentState:
     """This function handles multiple different inputs"""
+    
+    print("state in process_values before", state)
+
     state["result"] = (
         f"Hi there {state['name']}! Your sum = {sum(state['values'])}"
     )
+    
+    print("state in process_values after", state)
+
     return state
 
 
@@ -85,8 +91,8 @@ if __name__ == "__main__":
     initial_state: AgentState = {
         "values": [1, 2, 3, 4, 5],
         "name": "Alice",
-        "result": ""
     }
+
     result = app.invoke(initial_state)
-    print(result["result"])
+    print("result in main: ", result)
 
