@@ -28,13 +28,20 @@ class AgentState(TypedDict):
 
 def first_node(state: AgentState) -> AgentState:
     """This is the first node of our sequence"""
+    
+    print("state in first_node before", state)
     state["final"] = f"Hi {state['name']}!"
+    print("state in first_node after", state)
+
     return state
 
 
 def second_node(state: AgentState) -> AgentState:
     """This is the second node of our sequence"""
+    
+    print("state in second_node before", state)
     state["final"] = state["final"] + f"You are {state['age']} years old!"
+    print("state in second_node after", state)
     return state
 
 
@@ -91,8 +98,9 @@ if __name__ == "__main__":
     initial_state: AgentState = {
         "name": "Alice",
         "age": "25",
-        "final": ""
     }
+    print("initial_state in main: ", initial_state)
     result = app.invoke(initial_state)
+    print("result in main: ", result)
     print(result["final"])
 
