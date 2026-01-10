@@ -22,3 +22,8 @@ conda install conda-forge::langchain --yes
 # and managing state transitions in the Agentic Forge pipeline
 conda install conda-forge::langgraph --yes
 
+
+
+conda install conda-forge::langchain-openai
+
+conda install conda-forge::python-dotenv --yes
