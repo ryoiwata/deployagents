@@ -25,6 +25,9 @@ from langgraph.graph import END, START, StateGraph
 # Load environment variables from .env file
 load_dotenv()
 
+# Initialize the OpenAI chat model
+llm = ChatOpenAI(model="gpt-4o")
+
 
 # We now create an AgentState - shared data structure that keeps track of
 # information as your application runs.
@@ -32,24 +35,11 @@ class AgentState(TypedDict):
     messages: List[HumanMessage]
 
 
-def agent_node(state: AgentState) -> AgentState:
-    """Agent node that processes messages using OpenAI"""
-    # Initialize the OpenAI chat model
-    model = ChatOpenAI(model="gpt-3.5-turbo")
-
-    # Get the last message from the state
-    messages = state["messages"]
-    last_message = messages[-1] if messages else None
-
-    if last_message:
-        # Invoke the model with the message
-        response = model.invoke([last_message])
-        # Add the response to messages
-        state["messages"].append(response)
-        print(f"Agent response: {response.content}")
-    else:
-        print("No messages to process")
-
+def process(state: AgentState) -> AgentState:
+    """Process messages using OpenAI"""
+    response = llm.invoke(state["messages"])
+    print(f"\nAI: {response.content}")
+    state["messages"].append(response)
     return state
 
 
@@ -92,33 +82,20 @@ def generate_and_display_graph(
 if __name__ == "__main__":
     # Create and configure the graph
     graph = StateGraph(AgentState)
-    graph.add_node("agent", agent_node)
-
-    # Set entry point and flow
-    graph.add_edge(START, "agent")
-    graph.add_edge("agent", END)
-
-    app = graph.compile()
+    graph.add_node("process", process)
+    graph.add_edge(START, "process")
+    graph.add_edge("process", END)
+    agent = graph.compile()
 
     # Generate and save the graph visualization
-    generate_and_display_graph(app)
+    generate_and_display_graph(agent)
 
-    # Example usage
+    # Example usage - interactive input with continuous conversation
     print("\n" + "="*50)
     print("Agent Bot Example")
     print("="*50 + "\n")
 
-    initial_state: AgentState = {
-        "messages": [
-            HumanMessage(content="Hello! What is the capital of France?")
-        ]
-    }
-
-    result = app.invoke(initial_state)
-
-    print("\n" + "="*50)
-    print("Conversation:")
-    print("="*50)
-    for i, msg in enumerate(result["messages"], 1):
-        msg_type = "Human" if isinstance(msg, HumanMessage) else "Agent"
-        print(f"{msg_type} {i}: {msg.content}")
+    user_input = input("Enter: ")
+    while user_input != "exit":
+        agent.invoke({"messages": [HumanMessage(content=user_input)]})
+        user_input = input("Enter: ")
