@@ -123,3 +123,5 @@ if __name__ == "__main__":
     print(f"Counter: {result['counter']}")
     print(f"Random numbers: {result['number']}")
 
+
+
