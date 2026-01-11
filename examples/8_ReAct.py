@@ -48,7 +48,19 @@ def add(a: int, b: int):
     return a + b
 
 
-tools = [add]
+@tool
+def subtract(a: int, b: int):
+    """Subtraction function"""
+    return a - b
+
+
+@tool
+def multiply(a: int, b: int):
+    """Multiplication function"""
+    return a * b
+
+
+tools = [add, subtract, multiply]
 model = ChatOpenAI(model="gpt-4o").bind_tools(tools)
 
 
