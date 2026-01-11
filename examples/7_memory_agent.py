@@ -28,6 +28,7 @@ def process(state: AgentState) -> AgentState:
     state["messages"].append(AIMessage(content=response.content))
 
     print(f"\nAI: {response.content}")
+    print("Current state: ", state["messages"])
 
     return state
 
