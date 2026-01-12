@@ -44,3 +44,4 @@ def generate_and_display_graph(app, output_filename: str = "graph.png"):
         print(f"Warning: Could not generate graph visualization: {e}")
         print("Continuing without graph visualization...")
 
+
