@@ -133,50 +133,29 @@ def our_agent(state: AgentState) -> AgentState:
     return {"messages": list(state["messages"]) + [user_message, response]}
 
 
-def process_tool_results(state: AgentState) -> AgentState:
-    """Process tool results and update state based on tool calls."""
-    import json
-    messages = state["messages"]
-
-    # Find the last agent message with tool calls
-    last_agent_message = None
-    for msg in reversed(messages):
-        if hasattr(msg, "tool_calls") and msg.tool_calls:
-            last_agent_message = msg
-            break
-
-    if last_agent_message and last_agent_message.tool_calls:
-        for tool_call in last_agent_message.tool_calls:
-            tool_name = tool_call["name"]
-
-            if tool_name == "update":
-                # Extract content from tool call arguments
-                if isinstance(tool_call.get("args"), str):
-                    args = json.loads(tool_call["args"])
-                else:
-                    args = tool_call.get("args", {})
-                content = args.get("content", "")
-                state["document_content"] = content
-
-    return state
-
-
 def should_continue(state: AgentState) -> str:
-    """Determine if we should continue or end the conversation."""
+    """Determine if we should continue or end the conversation.
+
+    Checks the last message in the state: if it's a ToolMessage indicating
+    a successful save, return 'end'; otherwise, return 'agent' to continue.
+    """
     messages = state["messages"]
 
     if not messages:
-        return "continue"
+        return "agent"
 
-    # This looks for the most recent tool message....
-    for message in reversed(messages):
-        # ... and checks if this is a ToolMessage resulting from save
-        if (isinstance(message, ToolMessage) and
-                "saved" in message.content.lower() and
-                "document" in message.content.lower()):
-            return "end"  # goes to the end edge which leads to the endpoint
+    # Check the last message
+    last_message = messages[-1]
 
-    return "continue"
+    # If it's a ToolMessage indicating successful save, end the conversation
+    if (isinstance(last_message, ToolMessage) and
+            "saved" in last_message.content.lower() and
+            "document" in last_message.content.lower() and
+            "successfully" in last_message.content.lower()):
+        return "end"
+
+    # Otherwise, continue to agent
+    return "agent"
 
 
 def print_messages(messages):
@@ -193,18 +172,16 @@ graph = StateGraph(AgentState)
 
 graph.add_node("agent", our_agent)
 graph.add_node("tools", ToolNode(tools))
-graph.add_node("process_tools", process_tool_results)
 
 graph.set_entry_point("agent")
 
 graph.add_edge("agent", "tools")
-graph.add_edge("tools", "process_tools")
 
 graph.add_conditional_edges(
-    "process_tools",
+    "tools",
     should_continue,
     {
-        "continue": "agent",
+        "agent": "agent",
         "end": END,
     },
 )
