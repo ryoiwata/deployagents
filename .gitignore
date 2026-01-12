@@ -1,3 +1,9 @@
+# Ignore all files in the logs directory
+logs/
+
+# Ignore all files in the vectorstores directory
+vectorstores/
+
 # Environment files
 envs/
 
