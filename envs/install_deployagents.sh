@@ -22,8 +22,22 @@ conda install conda-forge::langchain --yes
 # and managing state transitions in the Agentic Forge pipeline
 conda install conda-forge::langgraph --yes
 
+# langchain-openai: OpenAI integration for LangChain
+# Provides ChatOpenAI and OpenAIEmbeddings classes for LLM and embedding models
+conda install conda-forge::langchain-openai --yes
 
-
-conda install conda-forge::langchain-openai
-
+# python-dotenv: Environment variable management
+# Used for loading API keys and configuration from .env files
 conda install conda-forge::python-dotenv --yes
+
+# langchain-community: Community-maintained LangChain integrations
+# Provides document loaders (PyPDFLoader) and other community integrations
+conda install conda-forge::langchain-community --yes
+
+# langchain: Core LangChain framework (redundant with line 18, but ensures installation)
+# Framework for building LLM applications with text splitting and vector store integration
+conda install conda-forge::langchain --yes
+
+# pypdf: PDF processing library
+# Required dependency for PyPDFLoader to read and parse PDF files
+conda install conda-forge::pypdf --yes
